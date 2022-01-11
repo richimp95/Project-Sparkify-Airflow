@@ -9,7 +9,8 @@ class LoadDimensionOperator(BaseOperator):
     Input:
         redshift_conn_id (string):  Redshift connection credentials
         table (string):  Table name in Redshift
-        query (string): Query that inserts the data in the respective dimension table         
+        query (string): Query that inserts the data in the respective dimension table  
+        append_flag (Boolean): When True it truncates the table and then inserts all the data
     
     '''
     
