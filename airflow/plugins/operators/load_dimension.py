@@ -21,21 +21,26 @@ class LoadDimensionOperator(BaseOperator):
                  table = "",
                  redshift_conn_id="redshift",
                  query="",
+                 append_flag=False,
                  *args, **kwargs):
 
-        super(LoadDimensionOperator, self).__init__(*args, **kwargs)
+        super(LoadFactOperator, self).__init__(*args, **kwargs)
         # Map params here
         self.table = table
         self.redshift_conn_id = redshift_conn_id
         self.query = query
+        self.append_flag = append_flag
 
-    def execute(self, context):
+    def execute(self, context):  
+        
         redshift = PostgresHook(postgres_conn_id=self.redshift_conn_id)
         
-        ## Run the following code if needed
-        #self.log.info(f"Delete {self.table} fact table")
-        #redshift.run(f"DELETE FROM {self.table}")   
-                
-        
-        self.log.info(f"Inserting data from the staging tables to {self.table} table")
-        redshift.run(self.query)
+        if (self.append_flag == True):
+            self.log.info(f"Inserting data from the staging tables to {self.table} table")
+            redshift.run(self.query)
+        else:
+            self.log.info(f"Tuncating data from {self.table} table")
+            redshift.run(f"truncate {self.table}")
+            
+            self.log.info(f"Inserting data from the staging tables to {self.table} table")
+            redshift.run(self.query)
