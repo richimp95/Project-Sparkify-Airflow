@@ -14,7 +14,7 @@ default_args = {
     'email_on_retry': False,
     'retries': 3,
     'retry_delay': timedelta(minutes=5),
-    'catchup' = False
+    'catchup' : False
 }
 
 dag = DAG('udac_sparkify_dag',
