@@ -98,7 +98,28 @@ run_quality_checks = DataQualityOperator(
     task_id='Run_data_quality_checks',
     dag=dag,
     redshift_conn_id="redshift",
-    tables=["songs", "artists", "songplays", "users", "time"]
+    dq_checks = [
+                    {'check_sql': "SELECT COUNT(*) FROM {}" , 
+                     'expected_result': 0,
+                     'table': "songs"
+                    },
+                    {'check_sql': "SELECT COUNT(*) FROM {}" , 
+                     'expected_result': 0,
+                     'table': "artists"
+                    },
+                    {'check_sql': "SELECT COUNT(*) FROM {}" , 
+                     'expected_result': 0,
+                     'table': "songplays"
+                    },
+                    {'check_sql': "SELECT COUNT(*) FROM {}" , 
+                     'expected_result': 0,
+                     'table': "users"
+                    },
+                    {'check_sql': "SELECT COUNT(*) FROM {}" , 
+                     'expected_result': 0,
+                     'table': "time"
+                    }
+                ]
 )
 
 end_operator = DummyOperator(task_id='Stop_execution',  dag=dag)
