@@ -13,27 +13,17 @@ default_args = {
     'depends_on_past': False,
     'email_on_retry': False,
     'retries': 3,
-    'retry_delay': timedelta(minutes=5)
+    'retry_delay': timedelta(minutes=5),
+    'catchup' = False
 }
 
 dag = DAG('udac_sparkify_dag',
           default_args=default_args,
           description='Load and transform data in Redshift with Airflow',
-          schedule_interval='@daily',
-          catchup=False
+          schedule_interval='@hourly'
         )
 
 start_operator = DummyOperator(task_id='Begin_execution',  dag=dag)
-
-file = open(os.path.join(conf.get('core','dags_folder'),'create_tables.sql'))
-create_tables_sql = file.read()
-
-create_all_tables = PostgresOperator(
-    task_id="Create_all_tables",
-    dag=dag,
-    postgres_conn_id="redshift",
-    sql=create_tables_sql
-)
 
 stage_events_to_redshift = StageToRedshiftOperator(
     task_id='Stage_events',
@@ -108,11 +98,8 @@ run_quality_checks = DataQualityOperator(
 
 end_operator = DummyOperator(task_id='Stop_execution',  dag=dag)
 
-
-start_operator >> create_all_tables 
-
-create_all_tables >> stage_events_to_redshift
-create_all_tables >>  stage_songs_to_redshift
+start_operator >> stage_events_to_redshift
+start_operator >>  stage_songs_to_redshift
 
 stage_events_to_redshift >> load_songplays_table
 stage_songs_to_redshift >> load_songplays_table
